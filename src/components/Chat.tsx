@@ -41,6 +41,11 @@ const SEED_SUGGESTIONS: { title: string; prompt: string }[] = [
     prompt:
       "SWOT infographic for launching an AI copilot inside a legacy CRM.",
   },
+  {
+    title: "Recap video",
+    prompt:
+      "Recap as a narrated video how you'd plan a product launch in 5 steps, with captions.",
+  },
 ];
 
 function randomId() {

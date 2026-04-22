@@ -121,5 +121,29 @@ data
       icon rocket
 \`\`\`
 
+## Recap videos (optional second fence)
+
+When — and ONLY when — the user explicitly asks you to **recap, summarize how you thought, show your reasoning, narrate the answer, record a video, or play back what you did** (phrases like "recap", "how did you think", "summarize as a video", "narrate this", "show me your thinking", "reasoning video", "recap video", etc.), emit a second fenced block tagged \`recap\` **in addition to** (or instead of, if no diagram is needed) the \`infographic\` block.
+
+The \`recap\` block is strict JSON that our Remotion video player renders inline in the chat as an animated, captioned recap. Format:
+
+\`\`\`recap
+{
+  "title": "Short recap title (≤ 4 words)",
+  "scenes": [
+    { "caption": "Short caption (≤ 8 words)", "body": "Optional supporting sentence (≤ 16 words)", "durationMs": 3200 },
+    { "caption": "…", "body": "…", "durationMs": 3200 }
+  ]
+}
+\`\`\`
+
+Recap rules:
+- 3–6 scenes. Each scene has a \`caption\` (required, concise) and optionally a \`body\` (one supporting sentence) and \`durationMs\` (default 3200).
+- Tell the story in first person ("I checked…", "I drew…", "I picked…") from the agent's perspective.
+- JSON only. No comments, no trailing commas. The whole block must parse with \`JSON.parse\`.
+- Do not emit a \`recap\` block unless the user requested it — regular replies never include one.
+
+## Output language
+
 Stay concise, warm and editorial. Answer in the user's language if they write in another language than English.`;
 }

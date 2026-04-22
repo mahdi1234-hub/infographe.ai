@@ -1,7 +1,18 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { parseAssistantText } from "@/lib/parseMessage";
 import InfographicRender from "./InfographicRender";
+
+const RecapPlayer = dynamic(() => import("./RecapPlayer"), {
+  ssr: false,
+  loading: () => (
+    <div
+      className="card-flashlight relative overflow-hidden rounded-[20px] border border-[color:var(--rule)] bg-white/60"
+      style={{ aspectRatio: "16 / 9" }}
+    />
+  ),
+});
 
 export type ChatMessage = {
   id: string;
@@ -53,17 +64,27 @@ export default function Message({ message }: { message: ChatMessage }) {
           {segments.length === 0 && message.streaming && (
             <span className="text-shimmer text-[15px]">Thinking…</span>
           )}
-          {segments.map((seg, idx) =>
-            seg.kind === "prose" ? (
-              <Paragraphs key={idx} text={seg.text} />
-            ) : (
+          {segments.map((seg, idx) => {
+            if (seg.kind === "prose") {
+              return <Paragraphs key={idx} text={seg.text} />;
+            }
+            if (seg.kind === "recap") {
+              return (
+                <RecapPlayer
+                  key={idx}
+                  storyboard={seg.storyboard}
+                  isPartial={seg.isPartial || !!message.streaming}
+                />
+              );
+            }
+            return (
               <InfographicRender
                 key={idx}
                 syntax={seg.syntax}
                 isPartial={seg.isPartial || !!message.streaming}
               />
-            ),
-          )}
+            );
+          })}
           {message.streaming && segments.length > 0 && (
             <span className="caret" aria-hidden />
           )}
