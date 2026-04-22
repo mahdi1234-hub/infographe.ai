@@ -194,7 +194,12 @@ export default function Showcase() {
                     </span>
                   </div>
                   <div className="mb-4 flex-1">
-                    <InfographicRender syntax={d.syntax} height={280} />
+                    <InfographicRender
+                      syntax={d.syntax}
+                      height={280}
+                      editable={false}
+                      compact
+                    />
                   </div>
                   <div className="flex items-end justify-between">
                     <p

@@ -71,9 +71,9 @@ export default function Home() {
       </header>
 
       {/* Hero */}
-      <section className="relative z-10 mx-auto max-w-[88rem] px-6 pb-8 pt-12 lg:px-12 lg:pt-20">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
-          <div className="lg:col-span-5">
+      <section className="relative z-10 mx-auto max-w-[96rem] px-6 pb-8 pt-12 lg:px-12 lg:pt-20">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-14">
+          <div className="lg:col-span-4">
             <p
               className="mb-4 text-xs font-medium uppercase tracking-[0.22em] text-[color:var(--ink-faint)]"
               style={{ fontFamily: "var(--font-geist-sans)" }}
@@ -138,7 +138,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div id="chat" className="lg:col-span-7">
+          <div id="chat" className="lg:col-span-8">
             <Chat />
           </div>
         </div>

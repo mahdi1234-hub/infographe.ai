@@ -171,7 +171,7 @@ export default function Chat() {
   };
 
   return (
-    <div className="flex h-[min(82vh,900px)] w-full flex-col overflow-hidden rounded-[28px] border border-[color:var(--rule-strong)] bg-[color:var(--bg-elevated)]/70 shadow-[0_40px_120px_-60px_rgba(44,40,36,0.35)] backdrop-blur">
+    <div className="flex h-[min(88vh,1000px)] w-full flex-col overflow-hidden rounded-[28px] border border-[color:var(--rule-strong)] bg-[color:var(--bg-elevated)]/70 shadow-[0_40px_120px_-60px_rgba(44,40,36,0.35)] backdrop-blur">
       {/* Scroller */}
       <div
         ref={scrollerRef}
@@ -220,7 +220,7 @@ export default function Chat() {
             </div>
           </div>
         ) : (
-          <div className="mx-auto flex max-w-3xl flex-col gap-6 pb-4">
+          <div className="mx-auto flex max-w-5xl flex-col gap-6 pb-4">
             {messages.map((m) => (
               <Message key={m.id} message={m} />
             ))}

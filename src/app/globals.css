@@ -172,6 +172,18 @@ body {
   height: auto;
 }
 
+/* Show a subtle highlight on editable text / icons so users know they can click.
+   The @antv/infographic editor adds hover/selected outlines of its own, but
+   these affordances help discovery on the first generated infographic. */
+.infographic-surface text,
+.infographic-surface tspan {
+  cursor: text;
+}
+.infographic-surface [data-interactable],
+.infographic-surface g[data-editable="true"] {
+  cursor: pointer;
+}
+
 /* Scroll bar in chat */
 .thin-scroll::-webkit-scrollbar {
   width: 8px;
