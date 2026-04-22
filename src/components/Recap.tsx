@@ -135,31 +135,16 @@ function Scene({
         ) : null}
       </div>
 
-      {/* Bottom: caption pill (live subtitle) + progress bar */}
+      {/* Bottom: progress bar + subtitle bar (karaoke-style word reveal) */}
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: 20,
+          alignItems: "stretch",
+          gap: 18,
           opacity,
         }}
       >
-        <div
-          style={{
-            alignSelf: "flex-start",
-            background: "rgba(44,40,36,0.9)",
-            color: "#F2EFEA",
-            padding: "14px 22px",
-            borderRadius: 999,
-            fontFamily: "'Geist Sans', system-ui, sans-serif",
-            fontSize: 22,
-            letterSpacing: "-0.005em",
-            maxWidth: "72ch",
-            boxShadow: "0 18px 40px -24px rgba(44,40,36,0.5)",
-          }}
-        >
-          {scene.caption}
-        </div>
         <div
           style={{
             height: 4,
@@ -177,8 +162,76 @@ function Scene({
             }}
           />
         </div>
+        <Subtitles text={scene.body || scene.caption} />
       </div>
     </AbsoluteFill>
+  );
+}
+
+function Subtitles({ text }: { text: string }) {
+  const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
+
+  const words = text
+    .split(/\s+/)
+    .map((w) => w.trim())
+    .filter(Boolean);
+  if (words.length === 0) return null;
+
+  // Reveal words across the middle 80% of the scene so they feel spoken.
+  const revealStart = Math.round(durationInFrames * 0.1);
+  const revealEnd = Math.round(durationInFrames * 0.9);
+  const span = Math.max(1, revealEnd - revealStart);
+
+  return (
+    <div
+      style={{
+        alignSelf: "center",
+        maxWidth: "80%",
+        background: "rgba(20,18,16,0.86)",
+        color: "#F2EFEA",
+        padding: "18px 28px",
+        borderRadius: 18,
+        fontFamily: "'Geist Sans', system-ui, sans-serif",
+        fontSize: 30,
+        lineHeight: 1.35,
+        letterSpacing: "-0.005em",
+        textAlign: "center",
+        boxShadow: "0 24px 60px -24px rgba(0,0,0,0.45)",
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "0.35em",
+        justifyContent: "center",
+      }}
+    >
+      {words.map((word, i) => {
+        const wordFrame = revealStart + Math.round((i / words.length) * span);
+        const active = frame >= wordFrame;
+        const recent = frame >= wordFrame && frame < wordFrame + 10;
+        const scale = interpolate(
+          frame - wordFrame,
+          [0, 6],
+          [1.25, 1],
+          { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+        );
+        return (
+          <span
+            key={i}
+            style={{
+              display: "inline-block",
+              opacity: active ? 1 : 0.32,
+              color: recent ? "#FFD59E" : "#F2EFEA",
+              transform: active ? `scale(${scale})` : "scale(1)",
+              transformOrigin: "center bottom",
+              transition: "none",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {word}
+          </span>
+        );
+      })}
+    </div>
   );
 }
 
