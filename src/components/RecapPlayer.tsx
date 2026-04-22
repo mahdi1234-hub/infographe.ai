@@ -39,6 +39,7 @@ export default function RecapPlayer({ storyboard, isPartial }: Props) {
   const [musicOn, setMusicOn] = useState(true);
   const [playing, setPlaying] = useState(false);
   const [chosenMood, setChosenMood] = useState<MoodName>(mood);
+  const [speed, setSpeed] = useState<number>(1);
   const prevMoodRef = useRef<MoodName>(mood);
 
   // Follow prop-driven mood changes (new storyboard streams in) without
@@ -146,6 +147,7 @@ export default function RecapPlayer({ storyboard, isPartial }: Props) {
           autoPlay={!isPartial}
           loop={false}
           clickToPlay
+          playbackRate={speed}
           acknowledgeRemotionLicense
         />
       </div>
@@ -183,7 +185,41 @@ export default function RecapPlayer({ storyboard, isPartial }: Props) {
         >
           {musicOn ? "music on" : "music off"}
         </button>
+
+        <span
+          className="ml-4"
+          style={{ fontFamily: "var(--font-geist-sans)" }}
+        >
+          speed
+        </span>
+        <div className="flex flex-wrap gap-1">
+          {SPEEDS.map((s) => {
+            const active = s === speed;
+            return (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setSpeed(s)}
+                className={`rounded-full border px-2.5 py-1 transition ${
+                  active
+                    ? "border-[color:var(--ink)] bg-[color:var(--ink)] text-[color:var(--bg)]"
+                    : "border-[color:var(--rule-strong)] bg-white/70 text-[color:var(--ink)] hover:bg-white"
+                }`}
+                style={{ fontFamily: "var(--font-geist-sans)" }}
+                aria-pressed={active}
+              >
+                {formatSpeed(s)}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
+}
+
+const SPEEDS = [0.5, 0.75, 1, 1.5, 2];
+
+function formatSpeed(s: number): string {
+  return Number.isInteger(s) ? `${s}×` : `${s}×`;
 }
