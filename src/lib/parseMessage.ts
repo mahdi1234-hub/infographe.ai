@@ -20,6 +20,7 @@ export type RecapScene = {
 
 export type RecapStoryboard = {
   title?: string;
+  mood?: string;
   scenes: RecapScene[];
 };
 
