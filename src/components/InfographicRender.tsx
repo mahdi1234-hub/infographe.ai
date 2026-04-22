@@ -2,6 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 
+type InfographicInstance = {
+  render: (syntax: string) => void;
+  destroy: () => void;
+};
+
 /**
  * Client-only wrapper around @antv/infographic.
  * Re-renders progressively as the `syntax` string grows during streaming.
@@ -23,13 +28,20 @@ export default function InfographicRender({
   isPartial = false,
 }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const instanceRef = useRef<{
-    render: (syntax: string) => void;
-    destroy: () => void;
-  } | null>(null);
+  const instanceRef = useRef<InfographicInstance | null>(null);
+  const latestSyntaxRef = useRef<string>(syntax);
+  const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Lazily create an instance bound to our container.
+  useEffect(() => {
+    latestSyntaxRef.current = syntax;
+  }, [syntax]);
+
+  // Lazily create an instance bound to our container, then render the
+  // most recent syntax. Without this initial render call, static demos
+  // (where syntax never changes after mount) would leave the container
+  // empty because the render-on-change effect fires before the async
+  // instance is ready.
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -37,7 +49,6 @@ export default function InfographicRender({
         const mod = await import("@antv/infographic");
         if (cancelled || !containerRef.current) return;
 
-        // Clear any previous content.
         containerRef.current.innerHTML = "";
 
         const instance = new mod.Infographic({
@@ -51,9 +62,19 @@ export default function InfographicRender({
           setError(summariseError(err));
         });
         instance.on("rendered", () => setError(null));
-        instanceRef.current = instance as unknown as typeof instanceRef.current;
+        instanceRef.current = instance as unknown as InfographicInstance;
+
+        const initialSyntax = latestSyntaxRef.current;
+        if (initialSyntax && initialSyntax.trim()) {
+          try {
+            instance.render(initialSyntax);
+          } catch {
+            /* handled via the instance's `error` event */
+          }
+        }
+        setReady(true);
       } catch (err) {
-        setError(summariseError(err));
+        if (!cancelled) setError(summariseError(err));
       }
     })();
     return () => {
@@ -68,10 +89,9 @@ export default function InfographicRender({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Render each time the syntax changes. Errors are surfaced through the
-  // library's `error` event listener registered above — catching here would
-  // otherwise trigger a cascading setState inside the effect.
+  // Re-render on subsequent syntax changes (streaming chat bubbles).
   useEffect(() => {
+    if (!ready) return;
     const inst = instanceRef.current;
     if (!inst) return;
     if (!syntax.trim()) return;
@@ -80,7 +100,7 @@ export default function InfographicRender({
     } catch {
       /* handled via the instance's `error` event */
     }
-  }, [syntax, isPartial]);
+  }, [syntax, isPartial, ready]);
 
   return (
     <div className="relative rounded-2xl border border-[color:var(--rule)] bg-white/70 px-3 py-4 shadow-[0_1px_0_rgba(0,0,0,0.03)]">
